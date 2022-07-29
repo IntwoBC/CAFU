@@ -114,7 +114,8 @@ report 50204 "Tax Invoice Report"
                         column(Posting_Date; "Sales Line"."Posting Date") { }
                         column(Unit_of_Measure; "Sales Line"."Unit of Measure") { }
                         column(Quantity; "Sales Line".Quantity) { }
-                        column(Unit_Price; "Sales Line"."Unit Price") { }
+                        column(Unit_Price; unitPrice)// "Sales Line"."Unit Price") 
+                        { }
                         column(VAT__; "Sales Line"."VAT %") { }
                         column(LineVatAmount; LineVatAmount) { }
                         column(Line_Amount; "Sales Line"."Line Amount") { }
@@ -189,6 +190,12 @@ report 50204 "Tax Invoice Report"
                                 FixedLength := 0;
                             end;
                             FixedLength := FixedLength + 1;
+
+                            Clear(unitPrice);
+                            if "Sales Line".Quantity <> 0 then
+                                unitPrice := "Sales Line"."VAT Base Amount" / "Sales Line".Quantity
+                            else
+                                unitPrice := "Sales Line"."Unit Price";
                         end;
 
                         trigger OnPostDataItem()
@@ -503,6 +510,7 @@ report 50204 "Tax Invoice Report"
         ArchiveDocumentEnable: Boolean;
         [InDataSet]
         LogInteractionEnable: Boolean;
+        unitPrice: Decimal;
 
     procedure InitializeRequest(NoOfCopiesFrom: Integer; ShowInternalInfoFrom: Boolean; ArchiveDocumentFrom: Boolean; LogInteractionFrom: Boolean; PrintFrom: Boolean)
     begin
